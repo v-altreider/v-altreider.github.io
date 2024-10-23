@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Imagens</title>
+	<style>
+		body{
+			padding: 0px;
+			background-color: #383838;
+			text-align: center;
+		}
+		.corpo{
+			margin-left: calc(50% - 600px);
+			max-width: 1200px;
+			background-color: #3774ad;
+			/*border: 1px solid black;*/
+			border-radius: 15px;
+		}
+		#canvas{
+			border-radius: 10px;
+			background-color: #fff;
+			margin-bottom: 15px;
+		}
+	</style>
+</head>
+<body>
+	<div class="corpo">
+		<h1>Editor de Imagens</h1>
+		<div style="background-color: #ffffff8a;width: 400px;margin-left: calc(50% - 210px);padding: 10px;border-radius: 10px;">
+			<div style="padding-bottom: 10px;">imagem base</div>
+			<input type="file" id="mainImageInput" accept="image/*"><br><br>
+		</div>
+		<div style="background-color: #ffffff8a;width: 400px;margin-left: calc(50% - 210px);padding: 10px;border-radius: 10px;margin-top: 15px;margin-bottom: 15px;">
+			<div style="padding-bottom: 10px;">
+				imagem d-agua
+			</div>
+			<input type="file" id="watermarkImageInput" accept="image/*"><br><br>
+		</div>
+		<button onclick="processImages()">Processar Imagens</button>
+		<br><br>
+		<canvas id="canvas" width="1080" height="1080" style="border:1px solid #000000;"></canvas>
+	</div>
+
+    <script>
+		function processImages() {
+			const mainImageInput = document.getElementById('mainImageInput');
+			const watermarkImageInput = document.getElementById('watermarkImageInput');
+			const canvas = document.getElementById('canvas');
+			const ctx = canvas.getContext('2d');
+
+			// Definir cor de fundo
+			ctx.fillStyle = "#D3D3D3";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			if (mainImageInput.files && mainImageInput.files[0] && watermarkImageInput.files && watermarkImageInput.files[0]) {
+				const mainImage = new Image();
+				const watermarkImage = new Image();
+
+				mainImage.onload = () => {
+					// Redimensionar imagem principal para caber no canvas
+					const scaleFactor = Math.min(canvas.width / mainImage.width, canvas.height / mainImage.height);
+					const mainWidth = mainImage.width * scaleFactor;
+					const mainHeight = mainImage.height * scaleFactor;
+					const mainX = (canvas.width - mainWidth) / 2;
+					const mainY = (canvas.height - mainHeight) / 2;
+
+					ctx.drawImage(mainImage, mainX, mainY, mainWidth, mainHeight);
+
+					watermarkImage.onload = () => {
+						// Redimensionar e desenhar a marca d'água
+						ctx.drawImage(watermarkImage, 0, 0, canvas.width, canvas.height);
+					};
+					watermarkImage.src = URL.createObjectURL(watermarkImageInput.files[0]);
+				};
+				mainImage.src = URL.createObjectURL(mainImageInput.files[0]);
+			} else {
+				alert("Por favor, selecione ambas as imagens.");
+			}
+		}
+
+	</script>
+</body>
+</html>
